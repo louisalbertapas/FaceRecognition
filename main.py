@@ -6,6 +6,7 @@ import cv2 as cv
 # Load cascades
 face_cascade = cv.CascadeClassifier('haarcascade_frontalface_default.xml')
 eye_cascade = cv.CascadeClassifier('haarcascade_eye.xml')
+smile_cascade = cv.CascadeClassifier('haarcascade_smile.xml')
 
 
 # function to detect face
@@ -27,11 +28,17 @@ def detect_face(gray, frame):
         roi_gray = gray[y: y + h, x: x + w]  # get the detected face as grayscale
         roi_color = frame[y: y + h, x: x + w]  # get the detected face as color. NOTE: this is not deep copy
 
-        # detect eyes in the face
+        # detect eyes on the face
         eyes = eye_cascade.detectMultiScale(roi_gray, 1.3, 5)
 
         for ex, ey, ew, eh in eyes:
             cv.rectangle(roi_color, (ex, ey), (ex + ew, ey + eh), (255, 0, 0), 2)
+
+        # detect smiles on the face
+        smiles = smile_cascade.detectMultiScale(roi_gray, 1.7, 12)
+
+        for sx, sy, sw, sh in smiles:
+            cv.rectangle(roi_color, (sx, sy), (sx + sw, sy + sh), (0, 0, 255), 2)
 
     return frame
 
@@ -51,7 +58,7 @@ while True:
 
     cv.imshow('frame', detected)
 
-    if cv.waitKey(1) == '27':  # wait for ESC key
+    if cv.waitKey(1) == 27:  # wait for ESC key
         break
 
 cap.release()
